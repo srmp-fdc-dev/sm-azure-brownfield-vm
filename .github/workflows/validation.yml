@@ -1,0 +1,85 @@
+# =========  =============
+# This workflow goes through the proccess of validating a service module
+# When a pull request against master is created, then this validation
+# flow will be triggered to ensure that (some) validation has taken place
+# before it is allowed to be merged and ready for use.
+
+# The itinerary is as follows:
+# 1. Create a workspace on tf cloud if one doesn't exist
+# 2. Configure the remote backend (since we will be test deploying on tf cloud)
+# 3. Initialise and validate terraform
+# 4. Deploy
+# 5. Destroy
+
+# Feedback will be available for all these steps for any stakeholders interested.
+name: service-module-validation
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  validation-flow:
+    env:
+      ORGANIZATION_NAME: "software-one"
+      WORKSPACE_NAME: ${{ github.event.repository.name }}
+    name: test terraform apply
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create workspace (if not present)
+        run: "bash ${GITHUB_WORKSPACE}/.github/create-workspace.sh"
+        env:
+          TF_API_TOKEN: ${{ secrets.TF_CLOUD_API_TOKEN }}
+          WORKSPACE_NAME: ${{ github.event.repository.name }}
+
+      - name: Create Remote Backend Configuration
+        run: |
+          echo "organization = \"${{ env.ORGANIZATION_NAME }}\"
+          workspaces { name = \"${{ env.WORKSPACE_NAME }}\" }" > backend.hcl
+          cat backend.hcl
+
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_CLOUD_API_TOKEN }}
+
+      - name: Initiaise Terraform
+        run: "terraform init \
+          -backend-config=backend.hcl"
+
+      - name: Validate Terraform
+        id: validate
+        run: terraform validate
+
+      - name: Validate Result
+        run: |
+          echo "Standard Output: ${{ steps.validate.outputs.stdout }}"
+          echo "Error Output: ${{ steps.validate.outputs.stderr }}"
+          echo "Exit Code: ${{ steps.validate.outputs.exitcode }}"
+
+      - name: Deploy Infrastructure
+        id: deploy
+        run: terraform apply -auto-approve
+
+      - name: Deployment Results
+        run: |
+          echo "Standard Output: ${{ steps.deploy.outputs.stdout }}"
+          echo "Error Output: ${{ steps.deploy.outputs.stderr }}"
+          echo "Exit Code: ${{ steps.deploy.outputs.exitcode }}"
+
+      - name: Destroy Infrastructure
+        id: Destroy
+        run: terraform destroy -auto-approve
+
+      - name: Destroyment Results
+        run: |
+          echo "Standard Output: ${{ steps.destroy.outputs.stdout }}"
+          echo "Error Output: ${{ steps.destroy.outputs.stderr }}"
+          echo "Exit Code: ${{ steps.destroy.outputs.exitcode }}"

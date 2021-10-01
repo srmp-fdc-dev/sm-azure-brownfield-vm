@@ -1,0 +1,41 @@
+# ========= Version Bumping =============
+# Manual Bumping: Any commit message that includes #major, #minor, or #patch 
+# will trigger the respective version bump. If two or more are present, 
+# the highest-ranking one will take precedence.
+
+# Automatic Bumping: If no #major, #minor or #patch tag is contained 
+# in the commit messages, it will bump whichever DEFAULT_BUMP is set 
+# to (which is minor by default). Disable this by setting DEFAULT_BUMP to none.
+
+
+name: bump-version
+on:
+  push:
+    branches:
+      - master
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.bump_verion_tag.outputs.tag }}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: '0'
+    - name: Bump version and push tag
+      id: bump_verion_tag
+      uses: anothrNick/github-tag-action@1.26.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        WITH_V: true
+        DEFAULT_BUMP: patch
+  branch:
+    runs-on: ubuntu-latest
+    needs: bump
+    steps:
+    - name: Create Branch
+      uses: peterjgrainger/action-create-branch@v2.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        branch: ${{ needs.bump.outputs.tag }}
