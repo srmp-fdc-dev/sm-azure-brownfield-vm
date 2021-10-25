@@ -6,6 +6,17 @@ terraform {
   }
 }
 
+provider "azurerm" {
+features {}
+# More information on the authentication methods supported by
+# the AzureRM Provider can be found here:
+# https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs
+tenant_id = var.tenant_id
+client_id = var.client_id
+client_secret = var.client_secret
+subscription_id = var.subscription_id
+}
+
 module "resource_group" {
   source               = "./modules/resource_group"
   resource_group       = var.resource_group
