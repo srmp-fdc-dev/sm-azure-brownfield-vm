@@ -92,5 +92,6 @@ variable "public_ip_sku" {
 }
 
 variable "isproduction" {
+  type = bool
   default = false
 }
