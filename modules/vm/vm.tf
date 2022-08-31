@@ -11,11 +11,13 @@ resource "azurerm_network_interface" "test" {
   }
 
   tags = {
-    Environment = var.isproduction == false ? "Development" : "Production"
+    Environment = var.isproduction ? "Development" : "Production"
   }
 }
 
 resource "azurerm_virtual_machine" "dev" {
+  count = var.isproduction ? 0 : 1
+
   name                = var.vm_name
   location            = var.location
   resource_group_name = var.resource_group
@@ -45,10 +47,11 @@ resource "azurerm_virtual_machine" "dev" {
   tags = {
     Environment = "Development"
   }
-  count = var.isproduction == false ? 1 : 0
 }
 
 resource "azurerm_virtual_machine" "prd" {
+  count = var.isproduction ? 1 : 0
+
   name                = var.vm_name
   location            = var.location
   resource_group_name = var.resource_group
@@ -78,5 +81,4 @@ resource "azurerm_virtual_machine" "prd" {
   tags = {
     Environment = "Production"
   }
-  count = var.isproduction == true ? 1 : 0
 }
