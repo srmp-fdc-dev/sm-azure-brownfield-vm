@@ -22,13 +22,11 @@ variable "resource_group" {
   type = string
   description = "Resource Group Name"
   default = "rg-victor-vm-ws"
-  }
-
+}
 variable "location" {
   type = string
   description = "Resource Group Location"
   default = "westeurope"
-
 }
 
 # Network
@@ -51,7 +49,6 @@ variable "address_prefixes" {
 variable "vm_name" {
   type = string
   description = "Virtual Machine Name"
-  default = "smazurevmws"
 }
 variable "vm_size" {
   type = map(string)
