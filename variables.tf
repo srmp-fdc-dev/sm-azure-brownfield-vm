@@ -63,7 +63,7 @@ variable "vm_admin_username" {
   description = "Virtual Machine Admin User"
   default = "adminmcc"
 }
-variable "vm_admin_password" {
+variable "sensitive_vm_admin_password" {
   type = string
   sensitive = true
   description = "Virtual Machine Admin Pwd"
