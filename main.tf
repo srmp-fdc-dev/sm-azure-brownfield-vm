@@ -70,7 +70,7 @@ module "vm" {
   subnet_id            = module.network.subnet_id_test
   public_ip_address_id = module.publicip.public_ip_address_id
   vm_admin_username    = var.vm_admin_username
-  vm_admin_password    = var.vm_admin_password
+  vm_admin_password    = var.sensitive_vm_admin_password
   storage_account_type = var.storage_account_type
   disk_size_gb         = var.disk_size_gb
   isproduction         = var.isproduction
