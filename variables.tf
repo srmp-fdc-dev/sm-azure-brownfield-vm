@@ -38,6 +38,7 @@ variable "virtual_network_name" {
 variable "address_space" {
   type = list(string)
   description = "Virtual Network Address Space"
+  default = ["10.0.0.0/16"]
 }
 variable "address_prefixes" {
   type = list(string)
@@ -52,6 +53,10 @@ variable "vm_name" {
 variable "vm_size" {
   type = map(string)
   description = "Virtual Machine Size"
+    default = {
+    dev = "Standard_B1ms"
+    prd = "Standard_A2_v2"
+  }
 }
 variable "vm_admin_username" {
   type = string
