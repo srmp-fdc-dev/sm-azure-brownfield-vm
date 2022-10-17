@@ -20,8 +20,7 @@ variable "subscription_id" {
 # Resource Group/Location
 variable "resource_group" {
   type = string
-  description = "Resource Group Name"
-  default = "rg-victor-vm-ws"
+  description = "Resource Group Name  @brownfield#Azure:Resourcegroup "
 }
 variable "location" {
   type = string

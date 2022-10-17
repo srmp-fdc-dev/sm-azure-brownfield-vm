@@ -21,12 +21,7 @@ client_secret = var.client_secret
 subscription_id = var.subscription_id
 }
 
-module "resource_group" {
-  source               = "./modules/resource_group"
-  resource_group       = join("-", [var.resource_group, random_string.random.id])
-  location             = var.location
-  isproduction         = var.isproduction
-}
+
 module "network" {
   source                = "./modules/network"
   address_space         = var.address_space
@@ -34,7 +29,7 @@ module "network" {
   virtual_network_name  = var.virtual_network_name
   vm_name               = join("-", [var.vm_name, random_string.random.id])
   resource_type         = "NET"
-  resource_group        = module.resource_group.resource_group_name
+  resource_group        = var.resource_group
   address_prefixes      = var.address_prefixes
   isproduction         = var.isproduction
 }
@@ -44,7 +39,7 @@ module "nsg-test" {
   location              = var.location
   vm_name               = join("-", [var.vm_name, random_string.random.id])
   resource_type         = "NSG"
-  resource_group        = module.resource_group.resource_group_name
+  resource_group        = var.resource_group
   subnet_id             = module.network.subnet_id_test
   address_prefixes      = var.address_prefixes
   isproduction         = var.isproduction
@@ -55,7 +50,7 @@ module "publicip" {
   location         = var.location
   vm_name          = join("-", [var.vm_name, random_string.random.id])
   resource_type    = "publicip"
-  resource_group   = module.resource_group.resource_group_name
+  resource_group   = var.resource_group
   public_ip_sku    = var.public_ip_sku
   isproduction         = var.isproduction
 }
@@ -63,7 +58,7 @@ module "publicip" {
 module "vm" {
   source               = "./modules/vm"
   location             = var.location
-  resource_group       = module.resource_group.resource_group_name
+  resource_group       = var.resource_group
   vm_name              = join("-", [var.vm_name, random_string.random.id])
   vm_size              = var.vm_size
   resource_type        = "vm"
